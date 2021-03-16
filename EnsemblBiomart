@@ -1,0 +1,50 @@
+# An example script demonstrating the use of BioMart API.
+# This perl API representation is only available for configuration versions >=  0.5 
+use strict;
+use BioMart::Initializer;
+use BioMart::Query;
+use BioMart::QueryRunner;
+
+my $confFile = "PATH TO YOUR REGISTRY FILE UNDER biomart-perl/conf/. For Biomart Central Registry navigate to
+						http://www.biomart.org/biomart/martservice?type=registry";
+#
+# NB: change action to 'clean' if you wish to start a fresh configuration  
+# and to 'cached' if you want to skip configuration step on subsequent runs from the same registry
+#
+
+my $action='cached';
+my $initializer = BioMart::Initializer->new('registryFile'=>$confFile, 'action'=>$action);
+my $registry = $initializer->getRegistry;
+
+my $query = BioMart::Query->new('registry'=>$registry,'virtualSchemaName'=>'default');
+
+		
+	$query->setDataset("hsapiens_gene_ensembl");
+	$query->addFilter("external_gene_name", ["RPL3L","GPNMB","ABCB11","RIOK3","DONSON","FTH1","VTN","PARL","PTP4A1","KIF18B","MME","TSR1","DDX31","CORO2B","SLC22A4","CKB","SYTL2","LYRM7","COQ8A","CEBPG","ACAA2","PNPLA4","PDCD2L","S100A3","TDRKH","HIBADH","MRM1","TXNIP","CENPV","EIF5A2","EFCAB7","PSMB9","GTF3C5","BRWD1","MRPL10","SPATA20","ARHGEF11","NUDT16","YIPF2","MRPL49","DNM1L","RIN1","SCRN2","MTIF3","APOE","DPYD","CDAN1","NPM3","CDKN2AIPNL","PHPT1","NFATC4","HMGN2","SYF2"]);
+	$query->addAttribute("ensembl_gene_id");
+	$query->addAttribute("ensembl_gene_id_version");
+	$query->addAttribute("ensembl_transcript_id");
+	$query->addAttribute("ensembl_transcript_id_version");
+	$query->addAttribute("5_utr_start");
+	$query->addAttribute("5_utr_end");
+	$query->addAttribute("5utr");
+
+$query->formatter("FASTA");
+
+my $query_runner = BioMart::QueryRunner->new();
+############################## GET COUNT ############################
+# $query->count(1);
+# $query_runner->execute($query);
+# print $query_runner->getCount();
+#####################################################################
+
+
+############################## GET RESULTS ##########################
+# to obtain unique rows only
+# $query_runner->uniqueRowsOnly(1);
+
+$query_runner->execute($query);
+$query_runner->printHeader();
+$query_runner->printResults();
+$query_runner->printFooter();
+#####################################################################
